@@ -10,21 +10,6 @@ function setUnits(unit)
   label.innerHTML = unit;
 }
 
-function convert()
-{
-  var litresButton = document.getElementById("litres");
-  var quantity = document.getElementById("quantity");
-
-  if (litresButton.checked)
-  {
-    convertToLitres(quantity.value);
-  }
-  else
-  {
-    convertToGallons(quantity.value);
-  }
-}
-
 function validateInput()
 {
   if (document.getElementById("litres").checked)
