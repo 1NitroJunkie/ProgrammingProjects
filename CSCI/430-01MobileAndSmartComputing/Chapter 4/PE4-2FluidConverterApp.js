@@ -1,16 +1,7 @@
 function initialize()
 {
-  var userInput = document.getElementsById("quantity");
-  if (document.getElementById("litres").checked)
-  {
-    userInput.addEventListener("blur", validateGallons);
-  }
-
-  else
-  {
-    userInput.addEventListener("blur", validateLitres);
-  }
-  
+  var userInput = document.getElementById("quantity");
+  userInput.addEventListener("blur", validateInput);
 }
 
 function setUnits(unit)
@@ -34,22 +25,24 @@ function convert()
   }
 }
 
-function validateGallons()
+function validateInput()
 {
-  var gallons = document.getElementById("quantity").value;
-  if (gallons < 1 || gallons > 1000)
+  if (document.getElementById("litres").checked)
   {
-    alert ('Gallons entered must be between 1 and 1000');
-    gallons = "";
+    var gallons = document.getElementById("quantity").value;
+    if (gallons < 1 || gallons > 1000)
+    {
+      alert ('Gallons entered must be between 1 and 1000');
+      gallons = "";
+    }
   }
-}
-
-function validateLitres()
-{
-  var litres = document.getElementById("quantity").value;
-  if (litres < 1 || litres > 4000)
+  else
   {
-    alert ('Litres entered must be between 1 and 4000');
-    litres = "";
+    var litres = document.getElementById("quantity").value;
+    if (litres < 1 || litres > 4000)
+    {
+      alert ('Litres entered must be between 1 and 4000');
+      litres = "";
+    }
   }
 }
