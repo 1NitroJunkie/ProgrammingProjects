@@ -26,13 +26,13 @@
                 <legend>
                     Convert to:
                 </legend>
-                <input type = "radio" name = "units" id = "gallons" value = "gallons" onclick = "setUnits('Litres')">
-                <label for = "gallons">
-                    Gallons
-                </label>
                 <input type = "radio" name = "units" id = "litres" value = "litres" checked = "checked" onclick = "setUnits('Gallons')">
                 <label for = "litres">
                     Litres
+                </label>
+                <input type = "radio" name = "units" id = "gallons" value = "gallons" onclick = "setUnits('Litres')">
+                <label for = "gallons">
+                    Gallons
                 </label>
             </fieldset> 
             <input type = "button" onclick = "convert()" value = "Convert">
