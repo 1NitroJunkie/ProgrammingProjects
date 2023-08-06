@@ -37,6 +37,7 @@ function getPassword() {
  */
 $("#btnEnter").click(function () {
   var password = getPassword();
+  Number = password.length
 
   if (document.getElementById("passcode").value ==
     password) {
@@ -58,11 +59,15 @@ $("#btnEnter").click(function () {
           "#pageMenu").button();
       }
     }
-  } else {
-    alert(
-      "Incorrect password, please try again."
-    );
-  }
+  } else
+    { 
+      while(Number > 0)
+      {
+        addValueToPassword("bksp");
+        Number--;
+      }
+      alert("Incorrect password, please try again.");
+    }
 });
 
 /* Records that the user has agreed to the legal
