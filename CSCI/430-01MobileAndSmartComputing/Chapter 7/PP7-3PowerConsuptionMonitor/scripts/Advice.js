@@ -6,55 +6,64 @@ function advicePage() {
     $(location).attr("href", "#pageMenu");
   } else {
 
-    var AvArr = new Array();
-    getDataRecords(AvArr);
+    var Avg = new Number;
+    findAverage(Avg);
 
-    var c = document.getElementById(
-      "AdviceCanvas");
+    var tbData = JSON.parse(localStorage.getItem("tbData"));
+    tbData.sort(compareDates);
+    var i = tbData.length - 1;
+    var KWH = tbData[i].KWH;
+
+    var c = document.getElementById("AdviceCanvas");
     var ctx = c.getContext("2d");
     ctx.fillStyle = "#c0c0c0";
-    ctx.fillRect(0, 0, 550, 550);
+    ctx.fillRect(0, 0, 500, 500);
     ctx.font = "22px Arial";
-    drawAdviceCanvas(ctx, AvArr);
-
+    drawAdviceCanvas(ctx, Avg, KWH);
   }
 }
 
-function getDataRecords(AvArr)
+function getDataRecords(recArr)
 {
   var tbData = JSON.parse(localStorage.getItem("tbData"));
+  tbRecords.sort(compareDates);
 
   for (var i = 0; i < tbData.length; i++)
-    AvArr[i] = parseFloat(tbData[i].KWH);
-
+  {
+    recArr[i] = parseFloat(tbData[i].KWH);
+  }
 }
 
-function findAverage()
+function findAverage(Avg)
 {
+  var AvArr = new Array();
+  getDataRecords(recArr);
   TOTAL = 0;
   length = AvArr.length;
-  for(var i = length; i > 0; i--)
+  for(var i = AvArr.length; i > 0; i--)
   {
     TOTAL += AvArr[i];
   }
-  AVERAGE = TOTAL / length;
-
+  Avg = TOTAL / AvArr.length;
 }
 
-function drawAdviceCanvas(ctx, AVERAGE) {
+function drawAdviceCanvas(ctx, Avg, KWH) {
   ctx.font = "22px Arial";
   ctx.fillStyle = "black";
-  ctx.fillText("Your average power consupmtion is currently: " + AVERAGE);
+  ctx.fillText("Your current power consupmtion is: " + KWH, 25, 400);
+  ctx.fillText("The average for the past six months is: " + Avg, 25, 400);
+  levelWrite(ctx, KWH);
+  levelMeter(ctx, KWH);
 }
 
 //For deciding what to write for given values of KWH level A
-function levelAwrite(ctx, KWH) {
-  if (KWH < AVERAGE) {
+function levelWrite(ctx, KWH) {
+  if (KWH < Avg - 100) {
     writeAdvice(ctx, "green");
-  } else if (KWH == AVERAGE) {
-    writeAdvice(ctx, "yellow");
-  } else {
+  } else if (KWH > Avg + 100) {
     writeAdvice(ctx, "red");
+  } else {
+    writeAdvice(ctx, "yellow");
   }
 }
 
@@ -71,27 +80,24 @@ function writeAdvice(ctx, level) {
     adviceLine =
       "Power consumption level is below average";
   }
-  ctx.fillText("Your Kilowatt-hour usage is " + level);
-  ctx.fillText(adviceLine, 25, 410);
+  ctx.fillText("Your Kilowatt-hour usage is " + level, 25, 400);
+  ctx.fillText(adviceLine, 25, 400);
 }
 
-function levelAMeter(ctx, KWH) {
-  if (KWH <= 3) {
+function levelMeter(ctx, KWH) {
+  if (KWH < 1000) {
     var cg = new RGraph.CornerGauge(
-        "AdviceCanvas", 0, 3, KWH)
+        "AdviceCanvas", 0, 1000, KWH)
       .Set("chart.colors.ranges", [
-        [0.5, 3, "red"],
-        [0.1, 0.5, "yellow"],
-        [0.01, 0.1, "#0f0"]
+        [KWH > Avg + 100, 999.99, "red"],
+        [KWH < Avg - 100, KWH > Avg + 100, "yellow"],
+        [0, KWH < Avg - 100, "green"]
       ]);
   } else {
     var cg = new RGraph.CornerGauge(
-        "AdviceCanvas", 0, KWH)
+        "AdviceCanvas", 1000, KWH, KWH)
       .Set("chart.colors.ranges", [
-        [0.5, 3, "red"],
-        [0.1, 0.5, "yellow"],
-        [0.01, 0.1, "#0f0"],
-        [3.01, KWH, "red"]
+        [1000, KWH, "red"]
       ]);
   }
   drawMeter(cg);
@@ -99,11 +105,12 @@ function levelAMeter(ctx, KWH) {
 
 // Meter properties
 function drawMeter(g) {
-  g.Set("chart.value.text.units.post", " mlU/L")
+  g.Set("chart.value.text.units.post", " kWh")
     .Set("chart.value.text.boxed", false)
     .Set("chart.value.text.size", 14)
     .Set("chart.value.text.font", "Verdana")
     .Set("chart.value.text.bold", true)
+    .Set("chart.value.text.decimals", 2)
     .Set("chart.shadow.offsetx", 5)
     .Set("chart.shadow.offsety", 5)
     .Set("chart.scale.decimals", 2)
