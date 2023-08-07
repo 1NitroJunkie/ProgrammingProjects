@@ -22,6 +22,9 @@ $(document).on("pageshow", function () {
     "pageUserInfo") {
     showUserForm();
   } else if ($('.ui-page-active').attr('id') ==
+    "pagePlantInfo") {
+    showPlantForm();
+  } else if ($('.ui-page-active').attr('id') ==
     "pageData") {
     loadUserInformation();
     loadPlantInformation();

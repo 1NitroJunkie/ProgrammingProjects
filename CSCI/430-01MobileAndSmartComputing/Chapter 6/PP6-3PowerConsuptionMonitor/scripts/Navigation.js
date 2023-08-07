@@ -37,7 +37,7 @@ function getPassword() {
  */
 $("#btnEnter").click(function () {
   var password = getPassword();
-  Number = password.length
+  Number = password.length;
 
   if (document.getElementById("passcode").value ==
     password) {
