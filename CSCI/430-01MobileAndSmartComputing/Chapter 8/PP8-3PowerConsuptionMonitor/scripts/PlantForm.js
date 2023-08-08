@@ -1,3 +1,5 @@
+var SERVER_URL = 'http://127.0.0.1:3000';
+
 $("#btnPlantClear").click(function () {
   clearPlantForm();
 });
@@ -37,29 +39,40 @@ function savePlantForm() {
       "InstallDate": $("#datInstDate").val()
     };
 
-    try {
-      localStorage.setItem("plant", JSON.stringify(
-        plant));
-      alert("Saving Information");
-
-      $.mobile.changePage("#pageMenu");
-      window.location.reload();
-    } catch (e) {
-      /* Google browsers use different error 
-       * constant
-       */
-      if (window.navigator.vendor ===
-        "Google Inc.") {
-        if (e == DOMException.QUOTA_EXCEEDED_ERR) {
-          alert(
-            "Error: Local Storage limit exceeds."
-          );
-        }
-      } else if (e == QUOTA_EXCEEDED_ERR) {
-        alert("Error: Saving to local storage.");
+    if ($("#btnPlantUpdate").val() == "Create") {
+      var plantData = {
+        newPlant: plant
       }
-
-      console.log(e);
+      $.post(SERVER_URL + '/saveNewPlant',
+        plantData,
+        function (data) {
+          alert(
+            "New Plant Created Successfully!"
+          );
+          sessionStorage.plant = JSON.stringify(
+            plant);
+          sessionStorage.password = plant.newPassword;
+          $("#btnPlantUpdate").val("Update");
+          $.mobile.changePage("#pageMenu");
+          window.location.reload();
+        }).fail(function (error) {
+        alert(error.responseText);
+      });
+    } else {
+      plant.agreedToLegal = JSON.parse(
+        sessionStorage.plant).agreedToLegal;
+      plant.password = sessionStorage.password;
+      $.post(SERVER_URL + '/updatePlant', plant,
+        function (data) {
+          sessionStorage.plant = JSON.stringify(
+            plant);
+          sessionStorage.password = plant.newPassword;
+        }).fail(function (error) {
+        alert(error.responseText);
+      }).done(function () {
+        $.mobile.changePage("#pageMenu");
+        window.location.reload();
+      });
     }
   } else {
     alert("Please complete the form properly.");
@@ -68,33 +81,19 @@ function savePlantForm() {
 }
 
 function clearPlantForm() {
-  localStorage.removeItem("plant");
-  alert("The stored data have been removed");
+  sessionStorage.removeItem("plant");
+  alert("The stored data has been removed");
 }
 
 function showPlantForm() { //Load the stored values in the form
-  try {
-    var plant = JSON.parse(localStorage.getItem(
-      "plant"));
-  } catch (e) {
-    /* Google browsers use different error 
-     * constant
-     */
-    if (window.navigator.vendor ===
-      "Google Inc.") {
-      if (e == DOMException.QUOTA_EXCEEDED_ERR) {
-        alert(
-          "Error: Local Storage limit exceeds."
-        );
-      }
-    } else if (e == QUOTA_EXCEEDED_ERR) {
-      alert("Error: Saving to local storage.");
-    }
-    console.log(e);
-  }
-
-  if (plant != null) {
+  if (sessionStorage.plant != null) {
+    $("#btnPlantUpdate").val("Update").button(
+      "refresh");
+    var plant = JSON.parse(sessionStorage.plant);
     $("#txtPlantID").val(plant.IdentificationNumber);
     $("#datInstDate").val(plant.InstallDate);
+  } else {
+    $("#btnPlantUpdate").val("Create").button(
+      "refresh");
   }
 }

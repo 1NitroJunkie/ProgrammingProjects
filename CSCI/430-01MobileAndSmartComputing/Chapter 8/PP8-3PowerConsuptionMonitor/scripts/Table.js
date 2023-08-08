@@ -1,6 +1,6 @@
-// Removes all data data from localStorage 
+// Removes all data data from sessionStorage 
 $("#btnClearHistory").click(function () {
-  localStorage.removeItem("tbData");
+  sessionStorage.removeItem("tbData");
   listData();
   alert("All data has been deleted.");
 });
@@ -13,11 +13,10 @@ $("#btnAddData").click(function () {
   /*.button("refresh") function forces jQuery
    * Mobile to refresh the text on the button
    */
-  $("#btnSubmitData").val("Add").button(
-    "refresh");
+  $("#btnSubmitData").val("Add");
 });
 
-$("#frmNewDataForm").submit(function () {
+$("#btnSubmitData").click(function () {
   var formOperation = $("#btnSubmitData").val();
 
   if (formOperation == "Add") {
@@ -52,33 +51,37 @@ $("#pageNewDataForm").on("pageshow", function () {
 });
 
 function loadUserInformation() {
-  try {
-    var user = JSON.parse(localStorage.getItem(
-      "user"));
-  } catch (e) {
-    /* Google browsers use different error 
-     * constant
-     */
-    if (window.navigator.vendor ===
-      "Google Inc.") {
-      if (e == DOMException.QUOTA_EXCEEDED_ERR) {
-        alert(
-          "Error: Local Storage limit exceeds."
-        );
-      }
-    } else if (e == QUOTA_EXCEEDED_ERR) {
-      alert("Error: Saving to local storage.");
-    }
-
-    console.log(e);
-  }
+  var user = JSON.parse(sessionStorage.user);
   if (user != null) {
     $("#divUserSection").empty();
+    var today = new Date();
+    var dob = new Date(user.DateOfBirth);
+    var age = Math.floor((today - dob) / (
+      365.25 * 24 * 60 * 60 * 1000));
 
-    $("#divUserSection").append("User's Name: " +
-      user.FirstName + " " + user.LastName +
-      "<br>Email Address: " + user.Email,
-      "<br>New Password: " + user.NewPassword,
+    //Display appropriate Cancer Stage
+    if (user.CancerStage == "StageOne") {
+      user.CancerStage = "Stage I";
+    } else if (user.CancerStage == "StageTwo") {
+      user.CancerStage = "Stage II";
+    } else if (user.CancerStage == "StageThree") {
+      user.CancerStage = "Stage III";
+    } else {
+      user.CancerStage = "Stage IV";
+    }
+
+    //Display appropriate TSH Range
+    if (user.TSHRange == "StageA") {
+      user.TSHRange = "A: 0.01-0.1 mIU/L";
+    } else if (user.TSHRange == "StageB") {
+      user.TSHRange = "B: 0.1-0.5 mIU/L";
+    } else {
+      user.TSHRange = "C: 0.35-2.0 mIU/L";
+    }
+
+    $("#divUserSection").append("User's Name:" +
+      user.firstName + " " + user.lastName);
+    $("#divUserSection").append(
       "<br><a href='#pageUserInfo' data-mini='true' data-role='button' data-icon='edit' data-iconpos='left' data-inline='true' >Edit Profile</a>"
     );
     $('#divUserSection [data-role="button"]').button(); // 'Refresh' the button
@@ -87,26 +90,7 @@ function loadUserInformation() {
 
 
 function loadPlantInformation() {
-  try {
-    var plant = JSON.parse(localStorage.getItem(
-      "plant"));
-  } catch (e) {
-    /* Google browsers use different error 
-     * constant
-     */
-    if (window.navigator.vendor ===
-      "Google Inc.") {
-      if (e == DOMException.QUOTA_EXCEEDED_ERR) {
-        alert(
-          "Error: Local Storage limit exceeds."
-        );
-      }
-    } else if (e == QUOTA_EXCEEDED_ERR) {
-      alert("Error: Saving to local storage.");
-    }
-
-    console.log(e);
-  }
+  var plant = JSON.parse(sessionStorage.plant);
   if (plant != null) {
     $("#divPlantSection").empty();
 
@@ -136,27 +120,11 @@ function compareDates(a, b) {
 }
 
 function listData() {
-  try {
-    var tbData = JSON.parse(localStorage.getItem(
-      "tbData"));
-  } catch (e) {
-    /* Google browsers use different error 
-     * constant
-     */
-    if (window.navigator.vendor ===
-      "Google Inc.") {
-      if (e == DOMException.QUOTA_EXCEEDED_ERR) {
-        alert(
-          "Error: Local Storage limit exceeds."
-        );
-      }
-    } else if (e == QUOTA_EXCEEDED_ERR) {
-      alert("Error: Saving to local storage.");
+    var tbData;
+    if (sessionStorage.tbData)
+    {
+      tbData = JSON.parse(sessionStorage.tbData);
     }
-
-    console.log(e);
-  }
-
   //Load previous data, if they exist
   if (tbData != null) {
     //Order the data by date
@@ -199,29 +167,11 @@ function listData() {
 }
 
 function showDataForm(index) {
-  try {
-    var tbData = JSON.parse(localStorage.getItem(
-      "tbData"));
+    var tbData = JSON.parse(sessionStorage.tbData);
     var rec = tbData[index];
+
     $('#datInputDate').val(rec.Date);
     $('#txtKWH').val(rec.KWH);
-  } catch (e) {
-    /* Google browsers use different error 
-     * constant
-     */
-    if (window.navigator.vendor ===
-      "Google Inc.") {
-      if (e == DOMException.QUOTA_EXCEEDED_ERR) {
-        alert(
-          "Error: Local Storage limit exceeds."
-        );
-      }
-    } else if (e == QUOTA_EXCEEDED_ERR) {
-      alert("Error: Saving to local storage.");
-    }
-
-    console.log(e);
-  }
 }
 
 /* Checks that users have entered all valid info
@@ -253,8 +203,7 @@ function callEdit(index) {
   /*.button("refresh") function forces jQuery
    * Mobile to refresh the text on the button
    */
-  $("#btnSubmitData").val("Edit").button(
-    "refresh");
+  $("#btnSubmitData").val("Edit");
 }
 
 // Delete the given index and re-display the table
@@ -270,36 +219,22 @@ function addData() {
       "KWH": $('#txtKWH').val()
     };
 
-    try {
-      var tbData = JSON.parse(localStorage.getItem(
-        "tbData"));
-      if (tbData == null) {
-        tbData = [];
-      }
-      tbData.push(data);
-      tbData.sort(compareDates);
-      localStorage.setItem("tbData", JSON.stringify(
-        tbData));
-      alert("Saving Information");
-      clearDataForm();
-      listData();
-    } catch (e) {
-      /* Google browsers use different error 
-       * constant
-       */
-      if (window.navigator.vendor ===
-        "Google Inc.") {
-        if (e == DOMException.QUOTA_EXCEEDED_ERR) {
-          alert(
-            "Error: Local Storage limit exceeds."
-          );
-        }
-      } else if (e == QUOTA_EXCEEDED_ERR) {
-        alert("Error: Saving to local storage.");
-      }
-
-      console.log(e);
+      
+    var tbData;
+    if (sessionStorage.tbData)
+    {
+      tbData = JSON.parse(sessionStorage.tbData);
     }
+    if (tbData == null) {
+      tbData = [];
+    }
+    tbData.push(data);
+    tbData.sort(compareDates);
+   sessionStorage.setItem("tbData", JSON.stringify(
+      tbData));
+    alert("Saving Information");
+    clearDataForm();
+    listData();
   } else {
     alert("Please complete the form properly.");
   }
@@ -308,72 +243,33 @@ function addData() {
 }
 
 function deleteData(index) {
-  try {
-    var tbData = JSON.parse(localStorage.getItem(
-      "tbData"));
+    var tbData = JSON.parse(sessionStorage.tbData);
 
     tbData.splice(index, 1);
 
     if (tbData.length == 0) {
       /* No items left in data, remove entire 
-       * array from localStorage
+       * array from sessionStorage
        */
-      localStorage.removeItem("tbData");
+      sessionStorage.removeItem("tbData");
     } else {
-      localStorage.setItem("tbData", JSON.stringify(
+      sessionStorage.setItem("tbData", JSON.stringify(
         tbData));
     }
-  } catch (e) {
-    /* Google browsers use different error 
-     * constant
-     */
-    if (window.navigator.vendor ===
-      "Google Inc.") {
-      if (e == DOMException.QUOTA_EXCEEDED_ERR) {
-        alert(
-          "Error: Local Storage limit exceeds."
-        );
-      }
-    } else if (e == QUOTA_EXCEEDED_ERR) {
-      alert("Error: Saving to local storage.");
-    }
-
-    console.log(e);
-  }
 }
 
 function editData(index) {
   if (checkDataForm()) {
-    try {
-      var tbData = JSON.parse(localStorage.getItem(
-        "tbData"));
+      var tbData = JSON.parse(sessionStorage.tbData);
       tbData[index] = {
         "Date": $('#datInputDate').val(),
         "KWH": $('#txtKWH').val()
       }; //Alter the selected item in the array
       tbData.sort(compareDates);
-      localStorage.setItem("tbData", JSON.stringify(
-        tbData)); //Saving array to local storage
+      sessionStorage.tbData = JSON.stringify(tbData); //Saving array to session storage
       alert("Saving Information");
       clearDataForm();
       listData();
-    } catch (e) {
-      /* Google browsers use different error 
-       * constant
-       */
-      if (window.navigator.vendor ===
-        "Google Inc.") {
-        if (e == DOMException.QUOTA_EXCEEDED_ERR) {
-          alert(
-            "Error: Local Storage limit exceeds."
-          );
-        }
-      } else if (e == QUOTA_EXCEEDED_ERR) {
-        alert("Error: Saving to local storage.");
-      }
-
-      console.log(e);
-    }
   } else {
     alert("Please complete the form properly.");
   }

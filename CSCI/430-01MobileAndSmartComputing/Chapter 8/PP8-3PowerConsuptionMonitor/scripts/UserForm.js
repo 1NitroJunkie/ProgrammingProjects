@@ -82,37 +82,22 @@ function saveUserForm() {
 }
 
 function clearUserForm() {
-  localStorage.removeItem("user");
-  alert("The stored data have been removed");
+  sessionStorage.clear("user");
+  alert("The stored data has been removed");
 }
 
 function showUserForm() { //Load the stored values in the form
-  try {
-    var user = JSON.parse(localStorage.getItem(
-      "user"));
-  } catch (e) {
-    /* Google browsers use different error 
-     * constant
-     */
-    if (window.navigator.vendor ===
-      "Google Inc.") {
-      if (e == DOMException.QUOTA_EXCEEDED_ERR) {
-        alert(
-          "Error: Local Storage limit exceeds."
-        );
-      }
-    } else if (e == QUOTA_EXCEEDED_ERR) {
-      alert("Error: Saving to local storage.");
-    }
-
-    console.log(e);
-  }
-
-  if (user != null) {
-    $("#txtEmail").val(user.Email);
-    $("#txtFirstName").val(user.FirstName);
-    $("#txtLastName").val(user.LastName);
-    $("#datBirthdate").val(user.DOB);
-    $("#changePassword").val(user.NewPassword);
+  if (sessionStorage.user != null) {
+    $("#btnUserUpdate").val("Update").button(
+      "refresh");
+    var user = JSON.parse(sessionStorage.user);
+    $("#txtEmail").val(user.email);
+    $("#txtFirstName").val(user.firstName);
+    $("#txtLastName").val(user.lastName);
+    $("#datBirthdate").val(user.dateOfBirth);
+    $("#changePassword").val(user.newPassword);
+  } else {
+    $("#btnUserUpdate").val("Create").button(
+      "refresh");
   }
 }

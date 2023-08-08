@@ -19,35 +19,14 @@ function addValueToPassword(button) {
   }
 }
 
-/* 
- * Retrieves password from local storage if it
- * exists, otherwise returns the default password
- */
-function getPassword() {
-  if (typeof (Storage) == "undefined") {
-    alert(
-      "Your browser does not support HTML5 localStorage. Try upgrading."
-    );
-  } else if (localStorage.getItem("user") !=
-    null) {
-    return JSON.parse(localStorage.getItem(
-      "user")).NewPassword;
-  } else {
-    /*Default password*/
-    return "2345";
-  }
-}
-
 /* On the main page, after password entry, directs
  * user to main page, legal disclaimer if they
  * have not yet agreed to it, or user entry page
  * if they have not yet completed their user info.
  */
 $("#btnEnter").click(function () {
-  loginCredentials = {Email: $("#Email").val(),
+  var loginCredentials = {email: $("#email").val(),
   password: $("#passcode").val()};
-  Number = password.length;
-
   $.post(SERVER_URL + '/login',
     loginCredentials,
     function (data) {
@@ -73,12 +52,13 @@ $("#btnEnter").click(function () {
         })
       } else
         { 
+          Number = password.length;
           while(Number > 0)
           {
             addValueToPassword("bksp");
             Number--;
           }
-          alert("Incorrect password, please try again.");
+          alert('An error occurred logging user in.');
         }
     }).fail(function (error) {
     alert(error.responseText);
