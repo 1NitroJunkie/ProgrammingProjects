@@ -1,3 +1,5 @@
+var SERVER_URL = 'http://127.0.0.1';
+
 // Removes all data data from sessionStorage 
 $("#btnClearHistory").click(function () {
   sessionStorage.removeItem("tbData");

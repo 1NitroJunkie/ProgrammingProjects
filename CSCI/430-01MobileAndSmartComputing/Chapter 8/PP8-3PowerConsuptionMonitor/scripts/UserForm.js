@@ -1,10 +1,10 @@
-var SERVER_URL = 'http://127.0.0.1:3000';
+var SERVER_URL = 'http://127.0.0.1';
 
 $("#btnUserClear").click(function () {
   clearUserForm();
 });
 
-$("#frmUserForm").submit(function () { //Event : submitting the form
+$("#btnUserUpdate").click(function () { //Event : submitting the form
   saveUserForm();
   return true;
 });
