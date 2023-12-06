@@ -1,6 +1,6 @@
 // Joseph White
 // 12/4/2023
-// CSCI 320: Week 5 Assignment
+// CSCI 320: Week 5 Programming Assignment 3.1
 
 
 #include <stdio.h>
