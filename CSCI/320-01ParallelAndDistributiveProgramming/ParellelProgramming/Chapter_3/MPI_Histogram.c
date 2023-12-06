@@ -1,5 +1,5 @@
 // Joseph White
-// 12/5/2023
+// 12/4/2023
 // CSCI 320: Week 5 Assignment
 
 
@@ -87,12 +87,14 @@ void Print_histo(
       float bin_maxes[] /* in */,
       int bin_counts[]  /* in */,
       int bin_count     /* in */,
-      float min_meas    /* in */) {
+      float min_meas    /* in */)
+{
    int i, j;
    float bin_max, bin_min;
    //print_histo method needs no changes
 
-   for (i = 0; i < bin_count; i++) {
+   for (i = 0; i < bin_count; i++)
+   {
       bin_max = bin_maxes[i];
       bin_min = (i == 0) ? min_meas: bin_maxes[i-1];
       printf("%.3f-%.3f:\t", bin_min, bin_max);
@@ -112,10 +114,12 @@ void Find_bins(
       float bin_maxes[]     /* in  */,
       int bin_count         /* in  */,
       float min_meas        /* in  */,
-      MPI_Comm comm){
+      MPI_Comm comm)
+{
 
    int i,bin;
-   for (i = 0; i < local_data_count; i++){
+   for (i = 0; i < local_data_count; i++)
+   {
       bin = Which_bin(local_data[i], bin_maxes, bin_count, min_meas);
       loc_bin_cts[bin]++;
    }
@@ -127,13 +131,15 @@ void Find_bins(
 
 /*---------------------------------------------------------------------*/
 int Which_bin(float data, float bin_maxes[], int bin_count,
-      float min_meas) {
+      float min_meas)
+{
     //which_bin code is ok and needs no changes
    int bottom = 0, top =  bin_count-1;
    int mid;
    float bin_max, bin_min;
 
-   while (bottom <= top) {
+   while (bottom <= top)
+   {
       mid = (bottom + top)/2;
       bin_max = bin_maxes[mid];
       bin_min = (mid == 0) ? min_meas: bin_maxes[mid-1];
@@ -157,14 +163,17 @@ void Set_bins(
       float max_meas     /* in  */,
       int bin_count      /* in  */,
       int my_rank        /* in  */,
-      MPI_Comm comm      /* in  */) {
+      MPI_Comm comm      /* in  */)
+{
 
-   if (my_rank == 0) {
+   if (my_rank == 0)
+   {
       int i;
       float bin_width;
       bin_width = (max_meas - min_meas) / bin_count;
 
-      for (i = 0; i < bin_count; i++) {
+      for (i = 0; i < bin_count; i++)
+      {
          loc_bin_cts[i] = 0;
          bin_maxes[i] = min_meas + (i+1)*bin_width;
       }
@@ -186,11 +195,13 @@ void Gen_data(
       float min_meas        /* in  */,
       float max_meas        /* in  */,
       int my_rank           /* in  */,
-      MPI_Comm comm         /* in  */) {
+      MPI_Comm comm         /* in  */)
+{
    int i;
    float* data = NULL;
 
-   if (my_rank ==0) {
+   if (my_rank ==0)
+   {
       data = malloc(data_count*sizeof(float));
       srand(time(NULL));
 
@@ -201,7 +212,9 @@ void Gen_data(
       //Call MPI_Scatter to send portions of the data array from process 0 to all the other processes.
       MPI_Scatter(data, local_data_count, MPI_FLOAT, local_data, local_data_count, MPI_FLOAT, 0, comm);
       free(data);
-   } else {
+   }
+   else
+   {
       //Call MPI_Scatter to get portions of the data array from process 0.
       MPI_Scatter(data, local_data_count, MPI_FLOAT, local_data, local_data_count, MPI_FLOAT, 0, comm);
    }
@@ -211,7 +224,8 @@ void Gen_data(
 /*---------------------------------------------------------------------*/
 void Get_input(int* bin_count_p, float* min_meas_p, float* max_meas_p,
       int* data_count_p, int* local_data_count_p, int my_rank,
-      int comm_sz, MPI_Comm comm) {
+      int comm_sz, MPI_Comm comm)
+{
 
    int local_ok = 1;
    //Ask the user for the number of bins (bin_count_p), min measurement (min_meas_p), max measurement( max_meas_p),
@@ -243,14 +257,17 @@ void Check_for_error(
      int       local_ok   /* in */,
      char      fname[]    /* in */,
      char      message[]  /* in */,
-     MPI_Comm  comm       /* in */) {
+     MPI_Comm  comm       /* in */)
+{
    int ok;
    //check_for_error method needs no changes.
    MPI_Allreduce(&local_ok, &ok, 1, MPI_INT, MPI_MIN, comm);
-   if (ok == 0) {
+   if (ok == 0)
+   {
       int my_rank;
       MPI_Comm_rank(comm, &my_rank);
-      if (my_rank == 0) {
+      if (my_rank == 0)
+      {
          fprintf(stderr, "Proc %d > In %s, %s\n", my_rank, fname,
                message);
          fflush(stderr);
