@@ -1,6 +1,6 @@
 // Joseph White
 // 12/12/2023
-// CSCI 320: Week 6 Programming Assignment 4.1
+// CSCI 320: Week 6 Programming Assignment 4.2
 
 #include <pthread.h>
 #include <stdio.h>
